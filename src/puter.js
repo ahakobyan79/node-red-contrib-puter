@@ -5,10 +5,26 @@ module.exports = function(RED) {
         const node = this;
         const Puter = require('puter');
 
-        // Initialize Puter with the API key
-        const puter = new Puter(config.apiKey);
+        // Initialize Puter
+        const puter = new Puter();
+
+        // Authenticate with Puter
+        puter.signIn(config.username, config.password)
+            .then(session => {
+                node.session = session;
+                node.status({fill:"green",shape:"dot",text:"authenticated"});
+            })
+            .catch(error => {
+                node.error("Authentication failed: " + error.message);
+                node.status({fill:"red",shape:"ring",text:"authentication failed"});
+            });
 
         node.on('input', function(msg) {
+            if (!node.session) {
+                node.error("Not authenticated");
+                return;
+            }
+
             const operation = config.operation;
             const path = msg.payload.path || config.path;
 
