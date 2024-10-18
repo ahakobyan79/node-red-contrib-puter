@@ -1,0 +1,57 @@
+<script type="text/html" data-template-name="puter">
+    <div class="form-row">
+        <label for="node-input-apiKey"><i class="fa fa-key"></i> API Key</label>
+        <input type="password" id="node-input-apiKey">
+    </div>
+    <div class="form-row">
+        <label for="node-input-operation"><i class="fa fa-tasks"></i> Operation</label>
+        <select id="node-input-operation">
+            <option value="readFile">Read File</option>
+            <option value="writeFile">Write File</option>
+            <option value="listFiles">List Files</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-path"><i class="fa fa-folder"></i> Path</label>
+        <input type="text" id="node-input-path">
+    </div>
+    <div class="form-row">
+        <label for="node-input-content"><i class="fa fa-file-text-o"></i> Content</label>
+        <input type="text" id="node-input-content">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="puter">
+    <p>A node to interact with Puter.js file storage service.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload.path <span class="property-type">string</span></dt>
+        <dd>The path of the file to read, write, or list.</dd>
+        <dt>payload.content <span class="property-type">string</span></dt>
+        <dd>The content to write to a file (for writeFile operation).</dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">string | object</span></dt>
+        <dd>The content of the file (for readFile), success message (for writeFile), or file list (for listFiles).</dd>
+    </dl>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('puter',{
+        category: 'storage',
+        color: '#a6bbcf',
+        defaults: {
+            apiKey: {type: "password"},
+            operation: {value: "readFile"},
+            path: {value: ""},
+            content: {value: ""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"Puter";
+        }
+    });
+</script>
