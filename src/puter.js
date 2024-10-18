@@ -4,10 +4,8 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         const node = this;
         const Puter = require('puter');
-
         // Initialize Puter
         const puter = new Puter();
-
         // Authenticate with Puter
         function authenticate() {
             puter.signIn(node.credentials.username, node.credentials.password)
@@ -20,20 +18,16 @@ module.exports = function(RED) {
                     node.status({fill:"red",shape:"ring",text:"authentication failed"});
                 });
         }
-
         // Attempt initial authentication
         authenticate();
-
         node.on('input', function(msg) {
             if (!node.session) {
                 node.error("Not authenticated");
                 authenticate(); // Try to authenticate again
                 return;
             }
-
             const operation = config.operation;
             const path = msg.payload.path || config.path;
-
             switch(operation) {
                 case 'readFile':
                     puter.readFile(path)
@@ -71,7 +65,6 @@ module.exports = function(RED) {
             }
         });
     }
-
     RED.nodes.registerType("puter", PuterNode, {
         credentials: {
             username: {type: "text"},
