@@ -1,41 +1,21 @@
-// src/puter.js
+// puter.js
 module.exports = function(RED) {
     function PuterNode(config) {
         RED.nodes.createNode(this, config);
         const node = this;
-        const Puter = require('puter');
-        const puter = new Puter();
+        const Puter = require('puter.com');
 
-        // Authenticate with Puter
-        function authenticate() {
-            if (!node.credentials || !node.credentials.username || !node.credentials.password) {
-                node.error("Missing credentials");
-                node.status({fill:"red",shape:"ring",text:"missing credentials"});
-                return;
-            }
-            puter.signIn(node.credentials.username, node.credentials.password)
-                .then(session => {
-                    node.session = session;
-                    node.status({fill:"green",shape:"dot",text:"authenticated"});
-                })
-                .catch(error => {
-                    node.error("Authentication failed: " + error.message);
-                    node.status({fill:"red",shape:"ring",text:"authentication failed"});
-                });
-        }
-
-        // Attempt initial authentication
-        authenticate();
+        // Initialize Puter client with credentials
+        const puter = new Puter({
+            username: node.credentials.username,
+            password: node.credentials.password
+        });
 
         node.on('input', function(msg) {
-            if (!node.session) {
-                node.error("Not authenticated");
-                authenticate(); // Try to authenticate again
-                return;
-            }
             const operation = config.operation;
             const path = msg.payload.path || config.path;
             const content = msg.payload.content || config.content;
+
             switch(operation) {
                 case 'readFile':
                     puter.readFile(path)
@@ -74,8 +54,8 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType("puter", PuterNode, {
         credentials: {
-            username: {type: "text"},
-            password: {type: "password"}
+            username: { type: "text" },
+            password: { type: "password" }
         }
     });
 }
