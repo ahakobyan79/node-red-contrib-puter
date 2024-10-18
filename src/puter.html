@@ -1,12 +1,5 @@
+<!-- Main node properties -->
 <script type="text/html" data-template-name="puter">
-    <div class="form-row">
-        <label for="node-input-username"><i class="fa fa-user"></i> Username</label>
-        <input type="text" id="node-input-username">
-    </div>
-    <div class="form-row">
-        <label for="node-input-password"><i class="fa fa-lock"></i> Password</label>
-        <input type="password" id="node-input-password">
-    </div>
     <div class="form-row">
         <label for="node-input-operation"><i class="fa fa-tasks"></i> Operation</label>
         <select id="node-input-operation">
@@ -25,13 +18,23 @@
     </div>
 </script>
 
+<!-- Credentials template -->
+<script type="text/html" data-credentials-name="puter">
+    <div class="form-row">
+        <label for="node-config-input-username"><i class="fa fa-user"></i> Username</label>
+        <input type="text" id="node-config-input-username">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-password"><i class="fa fa-lock"></i> Password</label>
+        <input type="password" id="node-config-input-password">
+    </div>
+</script>
+
 <script type="text/javascript">
     RED.nodes.registerType('puter',{
         category: 'storage',
         color: '#a6bbcf',
         defaults: {
-            username: {type: "text"},
-            password: {type: "password"},
             operation: {value: "readFile"},
             path: {value: ""},
             content: {value: ""}

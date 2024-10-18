@@ -1,13 +1,18 @@
-// puter.js
+// src/puter.js
 module.exports = function(RED) {
     function PuterNode(config) {
         RED.nodes.createNode(this, config);
         const node = this;
         const Puter = require('puter');
-        // Initialize Puter
         const puter = new Puter();
+
         // Authenticate with Puter
         function authenticate() {
+            if (!node.credentials || !node.credentials.username || !node.credentials.password) {
+                node.error("Missing credentials");
+                node.status({fill:"red",shape:"ring",text:"missing credentials"});
+                return;
+            }
             puter.signIn(node.credentials.username, node.credentials.password)
                 .then(session => {
                     node.session = session;
@@ -18,8 +23,10 @@ module.exports = function(RED) {
                     node.status({fill:"red",shape:"ring",text:"authentication failed"});
                 });
         }
+
         // Attempt initial authentication
         authenticate();
+
         node.on('input', function(msg) {
             if (!node.session) {
                 node.error("Not authenticated");
@@ -28,6 +35,7 @@ module.exports = function(RED) {
             }
             const operation = config.operation;
             const path = msg.payload.path || config.path;
+            const content = msg.payload.content || config.content;
             switch(operation) {
                 case 'readFile':
                     puter.readFile(path)
@@ -40,7 +48,6 @@ module.exports = function(RED) {
                         });
                     break;
                 case 'writeFile':
-                    const content = msg.payload.content || config.content;
                     puter.writeFile(path, content)
                         .then(() => {
                             msg.payload = { success: true, message: "File written successfully" };
