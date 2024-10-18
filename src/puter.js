@@ -9,19 +9,25 @@ module.exports = function(RED) {
         const puter = new Puter();
 
         // Authenticate with Puter
-        puter.signIn(config.username, config.password)
-            .then(session => {
-                node.session = session;
-                node.status({fill:"green",shape:"dot",text:"authenticated"});
-            })
-            .catch(error => {
-                node.error("Authentication failed: " + error.message);
-                node.status({fill:"red",shape:"ring",text:"authentication failed"});
-            });
+        function authenticate() {
+            puter.signIn(node.credentials.username, node.credentials.password)
+                .then(session => {
+                    node.session = session;
+                    node.status({fill:"green",shape:"dot",text:"authenticated"});
+                })
+                .catch(error => {
+                    node.error("Authentication failed: " + error.message);
+                    node.status({fill:"red",shape:"ring",text:"authentication failed"});
+                });
+        }
+
+        // Attempt initial authentication
+        authenticate();
 
         node.on('input', function(msg) {
             if (!node.session) {
                 node.error("Not authenticated");
+                authenticate(); // Try to authenticate again
                 return;
             }
 
@@ -66,5 +72,10 @@ module.exports = function(RED) {
         });
     }
 
-    RED.nodes.registerType("puter", PuterNode);
+    RED.nodes.registerType("puter", PuterNode, {
+        credentials: {
+            username: {type: "text"},
+            password: {type: "password"}
+        }
+    });
 }
